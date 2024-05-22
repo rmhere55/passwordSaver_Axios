@@ -1,106 +1,43 @@
-// const apiUrl = 'https://crudcrud.com/api/fc4df6e35039410188fb76795a83010f/Passwords'; // Replace with your actual API URL
+const apiUrl = 'https://crudcrud.com/api/f9306a912d9a423bab9da8f5213abd32/passwords';
+let passwords = [];
 
-// const addPassword = async (website, username, password) => {
-//     try {
-//         const response = await fetch(apiUrl, {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//             body: JSON.stringify({ website, username, password }),
-//         });
-//         if (!response.ok) {
-//             throw new Error('Failed to add password');
-//         }
-//         alert('Password Saved');
-//         showPasswords();
-//     } catch (error) {
-//         console.error('Error adding password:', error);
-//     }
-// };
-
-// const deletePassword = async (id) => {
-//     try {
-//         const response = await fetch(`${apiUrl}/${id}`, {
-//             method: 'DELETE',
-//         });
-//         if (!response.ok) {
-//             throw new Error('Failed to delete password');
-//         }
-//         alert('Password Deleted');
-//         showPasswords();
-//     } catch (error) {
-//         console.error('Error deleting password:', error);
-//     }
-// };
-
-// const showPasswords = async () => {
-//     try {
-//         const response = await fetch(apiUrl);
-//         if (!response.ok) {
-//             throw new Error('Failed to fetch passwords');
-//         }
-//         const data = await response.json();
-//         // Update your table or UI based on the data from the backend
-//     } catch (error) {
-//         console.error('Error fetching passwords:', error);
-//     }
-// };
-
-// window.onload = () => showPasswords();
-
-// document.querySelector('.btn').addEventListener('click', (e) => {
-//     e.preventDefault();
-//     const website = document.querySelector('input[name="website"]').value;
-//     const username = document.querySelector('input[name="username"]').value;
-//     const password = document.querySelector('input[name="password"]').value;
-//     addPassword(website, username, password);
-// });
-
-// document.querySelectorAll('.delete-btn').forEach((btn) => {
-//     btn.addEventListener('click', (e) => {
-//         e.preventDefault();
-//         const id = btn.dataset.id; // Assuming you have a data-id attribute on your delete buttons
-//         deletePassword(id);
-//     });
-// });
-
-
-// Import Axios library
-// const axios = require('axios');
-
-// Define your API base URL and API key
-const apiUrl = 'https://crudcrud.com/api/fc4df6e35039410188fb76795a83010f/passwords'; // Replace with your actual API URL
-
-// Function to fetch and display passwords on page load
-const showPasswords = async () => {
+// Fetch passwords from API
+const fetchPasswords = async () => {
     try {
         const response = await axios.get(apiUrl);
-        const data = response.data;
-        const tableBody = document.querySelector('table tbody');
-        tableBody.innerHTML = ''; // Clear existing table rows
-        data.forEach((password) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${password.website}</td>
-                <td>${password.username}</td>
-                <td>${password.password}</td>
-                <td><button class="delete-btn btnsm" data-id="${password._id}">Delete</button></td>
-            `;
-            tableBody.appendChild(row);
-        });
+        passwords = response.data;
+        displayPasswords(passwords);
     } catch (error) {
         console.error('Error fetching passwords:', error);
     }
 };
 
-// Function to add a new password
-const addPassword = async (website, username, password) => {
+// Display passwords in the table
+const displayPasswords = (passwordsToDisplay) => {
+    const passwordList = document.getElementById('passwordList');
+    passwordList.innerHTML = '';
+
+    passwordsToDisplay.forEach(password => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${password.email}</td>
+            <td>********</td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="editPassword('${password._id}')">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deletePassword('${password._id}')">Delete</button>
+            </td>
+        `;
+        passwordList.appendChild(row);
+    });
+};
+
+// Add a new password
+const addPassword = async (email, password) => {
     try {
-        const response = await axios.post(apiUrl, { website, username, password });
+        const response = await axios.post(apiUrl, { email, password });
         if (response.status === 201) {
-            alert('Password Saved');
-            await showPasswords(); // Update UI after adding new password
+            await fetchPasswords();
+            document.getElementById('passwordForm').reset();
         } else {
             throw new Error('Failed to add password');
         }
@@ -109,13 +46,37 @@ const addPassword = async (website, username, password) => {
     }
 };
 
-// Function to delete a password
+// Edit a password
+const editPassword = async (id) => {
+    const password = passwords.find(p => p._id === id);
+    if (password) {
+        document.getElementById('email').value = password.email;
+        document.getElementById('password').value = password.password;
+        document.getElementById('passwordForm').dataset.id = id;
+    }
+};
+
+// Update a password
+const updatePassword = async (id, email, password) => {
+    try {
+        const response = await axios.put(`${apiUrl}/${id}`, { email, password });
+        if (response.status === 200) {
+            await fetchPasswords();
+            document.getElementById('passwordForm').reset();
+        } else {
+            throw new Error('Failed to update password');
+        }
+    } catch (error) {
+        console.error('Error updating password:', error);
+    }
+};
+
+// Delete a password
 const deletePassword = async (id) => {
     try {
         const response = await axios.delete(`${apiUrl}/${id}`);
         if (response.status === 200) {
-            alert('Password Deleted');
-            await showPasswords(); // Update UI after deleting password
+            await fetchPasswords();
         } else {
             throw new Error('Failed to delete password');
         }
@@ -124,22 +85,27 @@ const deletePassword = async (id) => {
     }
 };
 
-// Event listener for form submission to add a password
-document.querySelector('form').addEventListener('submit', async (e) => {
+// Event listener for form submission
+const passwordForm = document.getElementById('passwordForm');
+passwordForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const website = document.querySelector('input[name="website"]').value;
-    const username = document.querySelector('input[name="username"]').value;
-    const password = document.querySelector('input[name="password"]').value;
-    await addPassword(website, username, password);
-});
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
-// Event delegation for delete button clicks
-document.addEventListener('click', async (e) => {
-    if (e.target.classList.contains('delete-btn')) {
-        const id = e.target.dataset.id;
-        await deletePassword(id);
+    if (passwordForm.dataset.id) {
+        await updatePassword(passwordForm.dataset.id, email, password);
+        delete passwordForm.dataset.id;
+    } else {
+        await addPassword(email, password);
     }
 });
 
-// Initial call to fetch and display passwords on page load
-window.onload = showPasswords;
+// Event listener for search input
+document.getElementById('search').addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    const filteredPasswords = passwords.filter(password => password.email.toLowerCase().includes(searchTerm));
+    displayPasswords(filteredPasswords);
+});
+
+// Fetch passwords on page load
+fetchPasswords();

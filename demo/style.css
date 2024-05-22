@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,700;1,300&family=Poppins:wght@300;400;600&display=swap');
 
+
 * {
     margin: 0;
     padding: 0;
@@ -15,12 +16,56 @@ nav {
     justify-content: space-between;
 }
 
-.logo {
-    margin: 0 23px;
+
+.logo{
+    
+    margin:  0 23px;
     font-weight: 800;
     font-size: 25px;
     cursor: pointer;
+    }
+    ul{
+    display: flex;
+    margin:  0 23px;
+    align-items: center;
+    }
+    ul >li{
+    list-style: none;
+    margin: 0 13px;
+    cursor: pointer;
 }
+table, td, tr{
+    border: 2px solid black;
+    border-collapse: collapse;
+    padding: 5px 13px;
+}
+
+.container-fluied{
+    max-width: 80vw;
+    margin:  23px auto  ;
+}
+
+h1 , h2,  h3{
+    margin: 23px 0px;
+}
+.btn{
+    padding: 8px 17px;
+    background: black;
+    color: white;
+    font-weight: 900;
+    border: 2px solid gray;
+    border-radius: 8px;
+    margin: 25px 0;
+    cursor: pointer;
+}
+
+
+ul >li:hover{
+    color: #fff;
+} 
+
+
+
 
 ul {
     display: flex;
@@ -34,14 +79,16 @@ ul > li {
     cursor: pointer;
 }
 
-ul > li:hover {
+ul > li:hover{
     color: white;
+
 }
 
-table, td, tr {
+table, td, tr{
     border: 2px solid black;
     border-collapse: collapse;
-    padding: 5px 13px;
+    margin: 2px;
+    padding: 15px 23px;
 }
 
 .container {
@@ -53,7 +100,7 @@ h1, h2, h3 {
     margin: 23px 0;
 }
 
-.btn {
+.btn{
     padding: 8px 17px;
     background: black;
     color: white;
@@ -64,17 +111,17 @@ h1, h2, h3 {
     cursor: pointer;
 }
 
-.btnsm {
+.btnsm{ 
     padding: 8px 17px;
     background: black;
     color: white;
     font-weight: 900;
     border: 2px solid gray;
-    border-radius: 8px;
+    border-radius: 8px; 
     cursor: pointer;
 }
 
-img {
+img{
     cursor: pointer;
     position: relative;
     bottom: 7px;
@@ -82,6 +129,6 @@ img {
     height: 13px;
 }
 
-#alert {
+#alert{
     display: none;
 }
